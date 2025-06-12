@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Práctico de Ley de Ohm para Mecánicos</title>
+    <style>
+        :root {
+            --color-primary: #e74c3c;
+            --color-secondary: #3498db;
+            --color-dark: #2c3e50;
+            --color-light: #ecf0f1;
+            --color-success: #2ecc71;
+            --color-warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--color-dark);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .progress-container {
+            background-color: #34495e;
+            border-radius: 20px;
+            width: 200px;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background-color: var(--color-success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .points-display {
+            background-color: var(--color-warning);
+            color: var(--color-dark);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        
+        .module {
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .module-header {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .module-content {
+            background-color: var(--color-light);
+            padding: 0.5rem;
+            display: none;
+        }
+        
+        .lesson {
+            padding: 0.7rem;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .lesson:hover {
+            background-color: #d6eaf8;
+        }
+        
+        .lesson.active {
+            background-color: #aed6f1;
+            font-weight: bold;
+        }
+        
+        .lesson.completed::before {
+            content: "✓";
+            margin-right: 5px;
+            color: var(--color-success);
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: white;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .character {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .character-image {
+            width: 120px;
+            height: 120px;
+            background-color: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        .character-info {
+            flex: 1;
+        }
+        
+        .simulation-area {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid #ddd;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .visualization {
+            height: 300px;
+            background-color: white;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        .circuit-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .battery {
+            width: 60px;
+            height: 100px;
+            background-color: #e74c3c;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .wire {
+            height: 10px;
+            background-color: #7f8c8d;
+            margin: 0 10px;
+        }
+        
+        .bulb {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f1c40f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 1); /* Initial glow */
+        }
+        
+        .exercise {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .exercise-title {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 1rem 0;
+        }
+        
+        .option {
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .option:hover {
+            border-color: var(--color-secondary);
+            background-color: #e3f2fd;
+        }
+        
+        .option.selected {
+            border-color: var(--color-success);
+            background-color: #e8f5e9;
+        }
+        
+        .calculator {
+            background-color: #e3f2fd;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .calc-inputs {
+            display: flex;
+            gap: 15px;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .calc-input {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        
+        .calc-input input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        .badge-container {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            border: 3px solid transparent;
+        }
+        
+        .badge.earned {
+            border-color: var(--color-warning);
+            background-color: #fef9e7;
+        }
+        
+        .badge-title {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.7rem;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #e8f5e9;
+            border: 1px solid var(--color-success);
+            color: #2e7d32;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffebee;
+            border: 1px solid #e74c3c;
+            color: #c62828;
+            display: block;
+        }
+
+        /* Drag and Drop styles */
+        .drag-item {
+            padding: 10px 15px;
+            background-color: var(--color-secondary);
+            color: white;
+            border-radius: 5px;
+            cursor: grab;
+            margin-bottom: 5px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+        }
+
+        .drop-target {
+            border: 2px dashed #ccc;
+            padding: 15px;
+            min-height: 100px;
+            width: 100%; /* Ensure it takes full width of its flex container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: all 0.2s;
+            position: relative; /* For placeholder positioning */
+        }
+
+        .drop-target.hover {
+            border-color: var(--color-primary);
+            background-color: #f0f8ff;
+        }
+        
+        .drop-target.correct {
+            border-color: var(--color-success);
+            background-color: #e8f5e9;
+        }
+
+        .drop-target.incorrect {
+            border-color: var(--color-primary);
+            background-color: #ffebee;
+        }
+
+        .drag-item-placeholder {
+            min-height: 40px; /* Space for the dragged item */
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .drop-target span {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .character {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .drag-area, .drop-area {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div>🔧</div>
+            <h1>Curso de Ley de Ohm para Mecánicos</h1>
+			<a href="LEY_de_Ohm_Manual_de-Uso.html" class="btn btn-secondary" style="margin-left: 20px; font-size: 0.8rem;">📘 Manual</a>
+
+        </div>
+        <div class="user-info">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="points-display">
+                <span id="points">0</span> puntos
+            </div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="module">
+                <div class="module-header">
+                    <span>Módulo 1: Conceptos Básicos</span>
+                </div>
+                <div class="module-content">
+                    <div class="lesson active" data-section="intro">1. El corazón eléctrico: La batería</div>
+                    <div class="lesson" data-section="characters">2. Los personajes eléctricos</div>
+                </div>
+            </div>
+            
+            <div class="module">
+                <div class="module-header">
+                    <span>Módulo 2: La Ley de Ohm</span>
+                </div>
+                <div class="module-content">
+                    <div class="lesson" data-section="formula">3. La fórmula mágica</div>
+                    <div class="lesson" data-section="triangle">4. El triángulo de Ohm</div>
+                </div>
+            </div>
+            
+            <div class="module">
+                <div class="module-header">
+                    <span>Módulo 3: Taller Práctico</span>
+                </div>
+                <div class="module-content">
+                    <div class="lesson" data-section="examples">5. Ejemplos reales</div>
+                    <div class="lesson" data-section="diagnosis">6. Diagnóstico de fallas</div>
+                    <div class="lesson" data-section="practice">7. Practica tú mismo</div>
+                </div>
+            </div>
+            
+            <div class="module">
+                <div class="module-header">
+                    <span>Tu Progreso</span>
+                </div>
+                <div class="module-content">
+                    <h3>Insignias Ganadas</h3>
+                    <div class="badge-container">
+                        <div class="badge" id="badge1">🔋<span class="badge-title">Batería</span></div>
+                        <div class="badge" id="badge2">💡<span class="badge-title">Conceptos</span></div>
+                        <div class="badge" id="badge3">🔍<span class="badge-title">Fallas</span></div>
+                        <div class="badge" id="badge4">🏆<span class="badge-title">Maestro</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-area">
+            <div class="section active" id="intro-section">
+                <div class="section-header">
+                    <h2>El corazón eléctrico de tu auto: ¡La Batería!</h2>
+                </div>
+                
+                <div class="character">
+                    <div class="character-image">🔋</div>
+                    <div class="character-info">
+                        <h3>Tu Auto: ¡Una Máquina con Su Propio Sistema Eléctrico!</h3>
+                        <p>Así como tu corazón bombea sangre, la batería del auto bombea energía eléctrica a todos lados. ¿Pero cómo llega esa energía y por qué a veces una luz es más fuerte que otra? ¡Ahí entra la Ley de Ohm!</p>
+                        <button class="btn btn-primary" id="battery-btn">Ver cómo funciona</button>
+                    </div>
+                </div>
+                
+                <div class="simulation-area">
+                    <h3>Simulador de Sistema Eléctrico</h3>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="battery-power">Potencia de la batería</label>
+                            <input type="range" id="battery-power" min="9" max="15" value="12" step="0.5">
+                            <span id="power-value">12V</span>
+                        </div>
+                    </div>
+                    
+                    <div class="visualization">
+                        <div class="circuit-diagram">
+                            <div class="battery">Batería</div>
+                            <div class="wire" style="width: 100px;"></div>
+                            <div class="bulb">💡</div>
+                            <div class="wire" style="width: 100px;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="exercise">
+                    <h3 class="exercise-title">Pregunta de comprensión</h3>
+                    <p>¿Qué sucede cuando la batería está baja (menos de 12V)?</p>
+                    <div class="options">
+                        <div class="option">El auto arranca más rápido</div>
+                        <div class="option">Los componentes eléctricos funcionan mejor</div>
+                        <div class="option">Los faros brillan con menos intensidad</div>
+                        <div class="option">La radio suena más fuerte</div>
+                    </div>
+                    <div class="feedback" id="intro-feedback"></div>
+                    <button class="btn btn-secondary check-option-btn" data-exercise="intro">Verificar respuesta</button>
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn btn-primary" disabled>Anterior</button>
+                    <button class="btn btn-primary" id="next-intro">Siguiente</button>
+                </div>
+            </div>
+            
+            <div class="section" id="characters-section">
+                <div class="section-header">
+                    <h2>¡Conoce a los Jefes de la Electricidad Automotriz!</h2>
+                </div>
+                
+                <div class="character">
+                    <div class="character-image">🔋</div>
+                    <div class="character-info">
+                        <h3>¡El Tío Voltio! - Voltaje (V)</h3>
+                        <p>El Tío Voltio es como el 'empujón' que da la batería. Piensa en él como la fuerza que hace que la electricidad quiera moverse. ¡En el auto, casi siempre son 12 Voltios!</p>
+                        <p><strong>Relación:</strong> Mientras más 'Tío Voltio' haya, más fuerte se empuja la electricidad.</p>
+                    </div>
+                </div>
+                
+                <div class="character">
+                    <div class="character-image">🚗</div>
+                    <div class="character-info">
+                        <h3>¡Ampere, el Flujo Rápido! - Corriente (I)</h3>
+                        <p>Ampere es la cantidad de electricidad que está pasando por un cable en un momento. ¡Es como el tráfico de autos por la carretera! Mientras más 'Ampere' haya, más cosas eléctricas están funcionando.</p>
+                        <p><strong>Relación:</strong> Una lámpara de faro usa más 'Ampere' que una lucecita del tablero.</p>
+                    </div>
+                </div>
+                
+                <div class="character">
+                    <div class="character-image">🚧</div>
+                    <div class="character-info">
+                        <h3>¡Ohmi, el Obstáculo! - Resistencia (R)</h3>
+                        <p>Ohmi es lo que frena o se opone al paso de la electricidad. Piensa en él como un bache o un camino angosto en el cable. ¡Todos los componentes del auto tienen 'Ohmi'!</p>
+                        <p><strong>Relación:</strong> Un cable viejo o una bombilla rota pueden tener mucho 'Ohmi', ¡y eso causa problemas!</p>
+                    </div>
+                </div>
+                
+                <div class="exercise">
+                    <h3 class="exercise-title">Identifica los conceptos</h3>
+                    <p>Arrastra cada concepto a su definición correcta:</p>
+                    <div style="display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+                        <div style="border: 2px dashed #ccc; padding: 15px; min-height: 180px; width: 200px; display: flex; flex-direction: column; align-items: center; background-color: #fefefe; border-radius: 8px;" id="drag-area">
+                            <div draggable="true" class="drag-item" id="drag-voltaje">Voltaje (V)</div>
+                            <div draggable="true" class="drag-item" id="drag-corriente">Corriente (I)</div>
+                            <div draggable="true" class="drag-item" id="drag-resistencia">Resistencia (R)</div>
+                        </div>
+                        <div style="border: 2px dashed #ccc; padding: 15px; min-height: 180px; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; background-color: #fefefe; border-radius: 8px;" id="drop-area">
+                            <div class="drop-target" data-concept="voltaje">
+                                <div class="drag-item-placeholder"></div>
+                                <span>Fuerza de empuje de la batería</span>
+                            </div>
+                            <div class="drop-target" data-concept="corriente">
+                                <div class="drag-item-placeholder"></div>
+                                <span>Tráfico de electrones</span>
+                            </div>
+                            <div class="drop-target" data-concept="resistencia">
+                                <div class="drag-item-placeholder"></div>
+                                <span>Obstáculo en el circuito</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feedback" id="drag-drop-feedback"></div>
+                    <button class="btn btn-secondary" id="check-drag-drop-btn">Verificar respuestas</button>
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-characters">Anterior</button>
+                    <button class="btn btn-primary" id="next-characters">Siguiente</button>
+                </div>
+            </div>
+            
+            <div class="section" id="formula-section">
+                <div class="section-header">
+                    <h2>3. La fórmula mágica: ¡V = I x R!</h2>
+                </div>
+                <p>Aquí es donde todo se une. La Ley de Ohm nos dice cómo se relacionan el Voltaje, la Corriente y la Resistencia.</p>
+                <h3>V = I × R</h3>
+                <ul>
+                    <li><strong>V</strong> es Voltaje (en Voltios, V)</li>
+                    <li><strong>I</strong> es Corriente (en Amperios, A)</li>
+                    <li><strong>R</strong> es Resistencia (en Ohmios, Ω)</li>
+                </ul>
+                <p>¡Piensa en esto como una receta! Si conoces dos ingredientes, puedes encontrar el tercero.</p>
+
+                <div class="exercise">
+                    <h3 class="exercise-title">Calcula lo que falta</h3>
+                    <p>Un faro tiene una resistencia de 4 Ohmios (Ω) y el auto le envía una corriente de 3 Amperios (A). ¿Cuál es el voltaje (V) que consume el faro?</p>
+                    <div class="calc-inputs">
+                        <div class="calc-input">
+                            <label for="ex-voltage">Voltaje (V)</label>
+                            <input type="number" id="ex-voltage" placeholder="?"> </div>
+                        <div class="calc-input">
+                            <label for="ex-current">Corriente (I)</label>
+                            <input type="number" id="ex-current" value="3" disabled>
+                        </div>
+                        <div class="calc-input">
+                            <label for="ex-resistance">Resistencia (R)</label>
+                            <input type="number" id="ex-resistance" value="4" disabled>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="check-formula-exercise">Verificar V</button> <div class="feedback" id="formula-exercise-feedback"></div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-formula">Anterior</button>
+                    <button class="btn btn-primary" id="next-formula">Siguiente</button>
+                </div>
+            </div>
+
+            <div class="section" id="triangle-section">
+                <div class="section-header">
+                    <h2>4. El triángulo de Ohm: ¡Tu amigo en el taller!</h2>
+                </div>
+                <p>Para hacer las cosas aún más fáciles, ¡usa el triángulo de Ohm! Te ayuda a recordar las tres fórmulas sin problemas:</p>
+                <p style="text-align: center; font-size: 3em; font-weight: bold; line-height: 1.2;">
+                    V<br>
+                    <span style="font-size: 0.6em;">I &times; R</span>
+                </p>
+                <p>Simplemente cubre la variable que quieres encontrar y la fórmula aparecerá:</p>
+                <ul>
+                    <li>Para encontrar <strong>Voltaje (V)</strong>, cubre V: te queda <strong>I × R</strong>.</li>
+                    <li>Para encontrar <strong>Corriente (I)</strong>, cubre I: te queda <strong>V / R</strong>.</li>
+                    <li>Para encontrar <strong>Resistencia (R)</strong>, cubre R: te queda <strong>V / I</strong>.</li>
+                </ul>
+
+                <div class="calculator">
+                    <h3>Calculadora de la Ley de Ohm</h3>
+                    <p>¡Usa esta herramienta para resolver problemas en tu taller!</p>
+                    
+                    <div class="calc-inputs">
+                        <div class="calc-input">
+                            <label for="voltage">Voltaje (V)</label>
+                            <input type="number" id="voltage" placeholder="V">
+                        </div>
+                        
+                        <div class="calc-input">
+                            <label for="current">Corriente (I)</label>
+                            <input type="number" id="current" placeholder="A">
+                        </div>
+                        
+                        <div class="calc-input">
+                            <label for="resistance">Resistencia (R)</label>
+                            <input type="number" id="resistance" placeholder="Ω">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="calculate-ohm">Calcular</button>
+                    
+                    <div class="result" style="margin-top: 20px; font-size: 1.2rem; font-weight: bold;">
+                        V = I × R
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-triangle">Anterior</button>
+                    <button class="btn btn-primary" id="next-triangle">Siguiente</button>
+                </div>
+            </div>
+
+            <div class="section" id="examples-section">
+                <div class="section-header">
+                    <h2>5. Ejemplos Reales en el Auto</h2>
+                </div>
+                <p>¡Veamos cómo se aplica esto en situaciones comunes de tu taller!</p>
+                
+                <h3>Ejemplo 1: Verificando un Foco de Freno</h3>
+                <p>Un foco de freno nuevo tiene una resistencia de 2.4 Ω. Si la batería del auto suministra 12V, ¿cuánta corriente (I) debería pasar por el foco?</p>
+                <div class="calc-inputs">
+                    <div class="calc-input">
+                        <label>Voltaje (V)</label>
+                        <input type="number" value="12" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Corriente (I)</label>
+                        <input type="number" id="ex1-current" placeholder="?" >
+                    </div>
+                    <div class="calc-input">
+                        <label>Resistencia (R)</label>
+                        <input type="number" value="2.4" disabled>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="check-ex1">Calcular y Verificar</button>
+                <div class="feedback" id="feedback-ex1"></div>
+
+                <h3>Ejemplo 2: Resistencia de un Sensor</h3>
+                <p>Estás midiendo un sensor y ves que la corriente que pasa por él es de 0.5 A cuando la ECU le envía 5 V. ¿Cuál es la resistencia (R) de ese sensor?</p>
+                 <div class="calc-inputs">
+                    <div class="calc-input">
+                        <label>Voltaje (V)</label>
+                        <input type="number" value="5" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Corriente (I)</label>
+                        <input type="number" value="0.5" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Resistencia (R)</label>
+                        <input type="number" id="ex2-resistance" placeholder="?" >
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="check-ex2">Calcular y Verificar</button>
+                <div class="feedback" id="feedback-ex2"></div>
+                
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-examples">Anterior</button>
+                    <button class="btn btn-primary" id="next-examples">Siguiente</button>
+                </div>
+            </div>
+
+            <div class="section" id="diagnosis-section">
+                <div class="section-header">
+                    <h2>6. Diagnóstico de Fallas con Ley de Ohm</h2>
+                </div>
+                <p>La Ley de Ohm es tu mejor amiga para encontrar problemas eléctricos.</p>
+                <div class="exercise" id="diagnosis-exercise-1"> <h3>Escenario 1: Foco que no enciende</h3>
+                    <p>Un foco de tu auto no enciende. Mides el voltaje en los terminales del foco y es 12V. Mides la corriente y es 0A.</p>
+                    <p>¿Qué crees que está pasando?</p>
+                    <div class="options">
+                        <div class="option" data-answer="open-circuit">Hay un circuito abierto (cable cortado, foco quemado)</div>
+                        <div class="option" data-answer="short-circuit">Hay un cortocircuito</div>
+                        <div class="option" data-answer="low-voltage">El voltaje de la batería es muy bajo</div>
+                    </div>
+                    <div class="feedback" id="diagnosis-feedback1"></div>
+                    <button class="btn btn-secondary check-option-btn" data-exercise="diagnosis1">Verificar respuesta</button>
+                </div>
+
+                <div class="exercise" id="diagnosis-exercise-2"> <h3>Escenario 2: Fusible quemado repetidamente</h3>
+                    <p>Cambias un fusible y se quema de inmediato. Esto indica que hay un exceso de corriente.</p>
+                    <p>Según la Ley de Ohm (I = V/R), si el voltaje (V) es constante (12V de la batería), ¿qué debe haber sucedido con la resistencia (R) para que la corriente (I) aumente tanto?</p>
+                    <div class="options">
+                        <div class="option" data-answer="R-increased">La resistencia ha aumentado</div>
+                        <div class="option" data-answer="R-decreased">La resistencia ha disminuido mucho (cortocircuito)</div>
+                        <div class="option" data-answer="V-increased">El voltaje ha aumentado</div>
+                    </div>
+                    <div class="feedback" id="diagnosis-feedback2"></div>
+                    <button class="btn btn-secondary check-option-btn" data-exercise="diagnosis2">Verificar respuesta</button>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-diagnosis">Anterior</button>
+                    <button class="btn btn-primary" id="next-diagnosis">Siguiente</button>
+                </div>
+            </div>
+
+            <div class="section" id="practice-section">
+                <div class="section-header">
+                    <h2>7. ¡Practica tú mismo!</h2>
+                </div>
+                <p>Ahora es tu turno de aplicar lo aprendido. Resuelve los siguientes problemas:</p>
+
+                <h3>Problema 1: Consumo de un Motor de Limpiaparabrisas</h3>
+                <p>Un motor de limpiaparabrisas consume 6 Amperios (A) cuando está funcionando con la batería de 12 Voltios (V) del auto. ¿Cuál es la resistencia (R) interna de ese motor?</p>
+                <div class="calc-inputs">
+                    <div class="calc-input">
+                        <label>Voltaje (V)</label>
+                        <input type="number" value="12" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Corriente (I)</label>
+                        <input type="number" value="6" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Resistencia (R)</label>
+                        <input type="number" id="practice1-resistance" placeholder="?" >
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="check-practice1">Verificar</button>
+                <div class="feedback" id="feedback-practice1"></div>
+
+                <h3>Problema 2: Voltaje en un Inyector</h3>
+                <p>Un inyector de combustible tiene una resistencia de 16 Ohmios (Ω). Si el módulo del motor le aplica una corriente de 0.75 Amperios (A), ¿cuál es el voltaje (V) que está recibiendo el inyector?</p>
+                <div class="calc-inputs">
+                    <div class="calc-input">
+                        <label>Voltaje (V)</label>
+                        <input type="number" id="practice2-voltage" placeholder="?" >
+                    </div>
+                    <div class="calc-input">
+                        <label>Corriente (I)</label>
+                        <input type="number" value="0.75" disabled>
+                    </div>
+                    <div class="calc-input">
+                        <label>Resistencia (R)</label>
+                        <input type="number" value="16" disabled>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="check-practice2">Verificar</button>
+                <div class="feedback" id="feedback-practice2"></div>
+
+                <div class="navigation">
+                    <button class="btn btn-primary" id="prev-practice">Anterior</button>
+                    <button class="btn btn-primary" id="next-practice">Finalizar Curso</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <footer>
+        <p>Curso Práctico de Ley de Ohm para Mecánicos - © 2025</p>
+    </footer>
+    
+    <script>
+        // --- INICIO DE INTEGRACIÓN APPS SCRIPT ---
+      const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9Tm5emxaRuGOrf7myF7ilW5kR8xwxOSOwRWQmekvNL5QX9KtRSUACEDVu4zcoZPJnjw/exec'; 
+        let studentId = null; // Variable para almacenar el ID del estudiante
+
+        async function sendScoreToSheet(eventType, scoreChange, totalScore, exerciseName = null, badgeEarned = null) {
+            // MODIFICACIÓN: Eliminar la comparación con el placeholder
+            if (!APP_SCRIPT_URL) { // Solo verificar si está vacía, no si es el placeholder
+                console.error("APP_SCRIPT_URL no está definida. No se pueden enviar datos.");
+                return;
+            }
+
+            const data = {
+                studentId: studentId,
+                eventType: eventType, 
+                scoreChange: scoreChange,
+                totalScore: totalScore, 
+                exerciseName: exerciseName,
+                badgeEarned: badgeEarned,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Necesario para Apps Script sin configurar CORS específico en el script
+                    headers: {
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(data)
+                });
+                console.log(`Datos enviados a Google Sheet para evento: ${eventType}`);
+                // Con 'no-cors', la respuesta del fetch siempre será 'opaque', no puedes leerla.
+                // Si necesitas depurar el script, usa Logger.log() en Apps Script y el panel de ejecuciones.
+            } catch (error) {
+                console.error('Error al enviar datos a Google Sheet:', error);
+            }
+        }
+        // --- FIN DE INTEGRACIÓN APPS SCRIPT ---
+
+
+        // Sistema de navegación entre lecciones
+        const lessons = document.querySelectorAll('.lesson');
+        const sections = document.querySelectorAll('.section');
+        const moduleHeaders = document.querySelectorAll('.module-header');
+        
+        moduleHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        lessons.forEach(lesson => {
+            lesson.addEventListener('click', () => {
+                // Remover clase active de todas las lecciones
+                lessons.forEach(l => l.classList.remove('active'));
+                
+                // Añadir clase active a la lección seleccionada
+                lesson.classList.add('active');
+                
+                // Ocultar todas las secciones
+                sections.forEach(section => section.classList.remove('active'));
+                
+                // Mostrar la sección correspondiente
+                const sectionId = lesson.getAttribute('data-section') + '-section';
+                document.getElementById(sectionId).classList.add('active');
+
+                // Asegurarse de que el módulo esté abierto
+                const moduleContent = lesson.closest('.module-content');
+                if (moduleContent) {
+                    moduleContent.style.display = 'block';
+                }
+            });
+        });
+        
+        // Navegación entre secciones (botones Siguiente/Anterior)
+        function navigateSections(currentSectionId, nextSectionId, nextLessonDataSection, prevSectionId) {
+            const currentSection = document.getElementById(currentSectionId);
+            const nextSection = document.getElementById(nextSectionId);
+            const prevSection = prevSectionId ? document.getElementById(prevSectionId) : null;
+
+            if (currentSection) currentSection.classList.remove('active');
+            if (nextSection) nextSection.classList.add('active');
+            else if (prevSection) prevSection.classList.add('active'); // Fallback if next not found
+
+            // Actualizar lección activa en la sidebar
+            lessons.forEach(l => l.classList.remove('active'));
+            if (nextLessonDataSection) {
+                const nextLesson = document.querySelector(`.lesson[data-section="${nextLessonDataSection}"]`);
+                if (nextLesson) {
+                    nextLesson.classList.add('active');
+                    // Asegurarse de que el módulo de la lección activa esté abierto
+                    const moduleContent = nextLesson.closest('.module-content');
+                    if (moduleContent) {
+                        moduleContent.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        // Event listeners para los botones de navegación
+        document.getElementById('next-intro').addEventListener('click', () => navigateSections('intro-section', 'characters-section', 'characters'));
+        document.getElementById('prev-characters').addEventListener('click', () => navigateSections('characters-section', 'intro-section', 'intro'));
+        document.getElementById('next-characters').addEventListener('click', () => navigateSections('characters-section', 'formula-section', 'formula'));
+        document.getElementById('prev-formula').addEventListener('click', () => navigateSections('formula-section', 'characters-section', 'characters'));
+        document.getElementById('next-formula').addEventListener('click', () => navigateSections('formula-section', 'triangle-section', 'triangle'));
+        document.getElementById('prev-triangle').addEventListener('click', () => navigateSections('triangle-section', 'formula-section', 'formula'));
+        document.getElementById('next-triangle').addEventListener('click', () => navigateSections('triangle-section', 'examples-section', 'examples'));
+        document.getElementById('prev-examples').addEventListener('click', () => navigateSections('examples-section', 'triangle-section', 'triangle'));
+        document.getElementById('next-examples').addEventListener('click', () => navigateSections('examples-section', 'diagnosis-section', 'diagnosis'));
+        document.getElementById('prev-diagnosis').addEventListener('click', () => navigateSections('diagnosis-section', 'examples-section', 'examples'));
+        document.getElementById('next-diagnosis').addEventListener('click', () => navigateSections('diagnosis-section', 'practice-section', 'practice'));
+        document.getElementById('prev-practice').addEventListener('click', () => navigateSections('practice-section', 'diagnosis-section', 'diagnosis'));
+        document.getElementById('next-practice').addEventListener('click', () => alert('¡Felicidades, has completado el curso!')); // Puedes cambiar esto por una sección de finalización
+
+
+        // Sistema de progreso
+        let points = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const pointsDisplay = document.getElementById('points');
+        
+        function addPoints(pts, exerciseName = 'general') {
+            const oldPoints = points;
+            points += pts;
+            pointsDisplay.textContent = points;
+            // Maximo de 100 puntos para la barra de progreso
+            progressBar.style.width = Math.min(points, 100) + '%'; 
+            sendScoreToSheet('points_earned', pts, points, exerciseName); // Enviar datos
+        }
+
+        function earnBadge(badgeId, exerciseName = null) {
+            document.getElementById(badgeId).classList.add('earned');
+            sendScoreToSheet('badge_earned', 0, points, exerciseName, badgeId); // Enviar datos (0 puntos, solo evento)
+        }
+
+        // Simulación de batería
+        const batteryPower = document.getElementById('battery-power');
+        const powerValue = document.getElementById('power-value');
+        const bulb = document.querySelector('.bulb');
+        
+        batteryPower.addEventListener('input', () => {
+            const value = parseFloat(batteryPower.value);
+            powerValue.textContent = value.toFixed(1) + 'V';
+            
+            // Actualizar visualización del brillo de la bombilla
+            if (value < 10) {
+                bulb.style.backgroundColor = '#f1c40f'; // Menos brillo
+                bulb.style.boxShadow = '0 0 8px rgba(241, 196, 15, 0.4)';
+            } else if (value >= 10 && value < 12) {
+                bulb.style.backgroundColor = '#f39c12'; // Brillo medio
+                bulb.style.boxShadow = '0 0 15px rgba(243, 156, 18, 0.7)';
+            } else {
+                bulb.style.backgroundColor = '#f1c40f'; // Brillo normal/alto
+                bulb.style.boxShadow = '0 0 20px rgba(241, 196, 15, 1)';
+            }
+        });
+        
+        // Manejar la selección de opciones en todos los ejercicios con opciones
+        document.querySelectorAll('.options .option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remover la clase 'selected' de todas las opciones dentro del mismo grupo de opciones
+                option.closest('.options').querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                // Añadir la clase 'selected' a la opción clickeada
+                option.classList.add('selected');
+            });
+        });
+
+        // Manejar la verificación de respuestas para todos los botones 'Verificar respuesta'
+        document.querySelectorAll('.check-option-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const exerciseType = e.target.getAttribute('data-exercise');
+                let selectedOption;
+                let feedbackDiv;
+                let isCorrect = false;
+                let exerciseElement;
+                let pointsToAward = 0; // Puntos por este ejercicio
+
+                if (exerciseType === 'intro') {
+                    exerciseElement = document.getElementById('intro-section');
+                    selectedOption = exerciseElement.querySelector('.options .option.selected');
+                    feedbackDiv = document.getElementById('intro-feedback');
+                    if (selectedOption && selectedOption.textContent.includes('faros brillan con menos intensidad')) {
+                        isCorrect = true;
+                        pointsToAward = 10;
+                    }
+                } else if (exerciseType === 'diagnosis1') {
+                    exerciseElement = document.getElementById('diagnosis-exercise-1');
+                    selectedOption = exerciseElement.querySelector('.options .option.selected');
+                    feedbackDiv = document.getElementById('diagnosis-feedback1');
+                    if (selectedOption && selectedOption.getAttribute('data-answer') === 'open-circuit') {
+                        isCorrect = true;
+                        pointsToAward = 15;
+                    }
+                } else if (exerciseType === 'diagnosis2') {
+                    exerciseElement = document.getElementById('diagnosis-exercise-2');
+                    selectedOption = exerciseElement.querySelector('.options .option.selected');
+                    feedbackDiv = document.getElementById('diagnosis-feedback2');
+                    if (selectedOption && selectedOption.getAttribute('data-answer') === 'R-decreased') {
+                        isCorrect = true;
+                        pointsToAward = 15;
+                    }
+                }
+
+                if (selectedOption) {
+                    if (isCorrect) {
+                        feedbackDiv.textContent = '¡Correcto! Excelente análisis.';
+                        feedbackDiv.className = 'feedback correct';
+                        if (!selectedOption.dataset.answeredCorrectly) {
+                            addPoints(pointsToAward, exerciseType); 
+                            if (exerciseType === 'intro') earnBadge('badge1', exerciseType);
+                            if (exerciseType === 'diagnosis1' || exerciseType === 'diagnosis2') earnBadge('badge3', exerciseType); 
+                            selectedOption.dataset.answeredCorrectly = 'true'; 
+                        }
+                    } else {
+                        feedbackDiv.textContent = 'Respuesta incorrecta. ¡Sigue practicando!';
+                        feedbackDiv.className = 'feedback incorrect';
+                    }
+                } else {
+                    feedbackDiv.textContent = 'Por favor, selecciona una opción.';
+                    feedbackDiv.className = 'feedback incorrect';
+                }
+            });
+        });
+
+        // Sistema de arrastrar y soltar
+        const dragItems = document.querySelectorAll('.drag-item');
+        const dropTargets = document.querySelectorAll('.drop-target');
+        const checkDragDropBtn = document.getElementById('check-drag-drop-btn');
+        const dragDropFeedback = document.getElementById('drag-drop-feedback');
+        
+        let draggedItem = null; // Para mantener la referencia al elemento arrastrado
+
+        dragItems.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = e.target;
+                e.dataTransfer.setData('text/plain', e.target.id); // Guardar el ID del elemento arrastrado
+                setTimeout(() => {
+                    e.target.classList.add('dragging'); // Opcional: estilo para el elemento mientras se arrastra
+                }, 0);
+            });
+
+            item.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+                draggedItem = null;
+            });
+        });
+        
+        dropTargets.forEach(target => {
+            target.addEventListener('dragover', (e) => {
+                e.preventDefault(); // Permite que se pueda soltar
+                target.classList.add('hover');
+            });
+            
+            target.addEventListener('dragleave', (e) => {
+                target.classList.remove('hover');
+            });
+
+            target.addEventListener('drop', (e) => {
+                e.preventDefault();
+                target.classList.remove('hover');
+                
+                const dataId = e.dataTransfer.getData('text/plain'); // Obtener el ID del elemento arrastrado
+                const originalDragItem = document.getElementById(dataId);
+
+                // Evitar soltar si ya hay un elemento o si no es un elemento arrastrable válido
+                if (!originalDragItem || target.querySelector('.drag-item')) {
+                    return;
+                }
+
+                // Clonar el elemento arrastrado para que el original permanezca en su lugar
+                const clonedItem = originalDragItem.cloneNode(true);
+                clonedItem.classList.remove('dragging'); // Eliminar clase de arrastre si existe
+
+                // Limpiar cualquier contenido existente en el placeholder y añadir el clon
+                const placeholder = target.querySelector('.drag-item-placeholder');
+                if (placeholder) {
+                    // Check if the placeholder already has a child
+                    if (placeholder.children.length > 0) {
+                        // If it does, move the existing child back to the drag-area
+                        const existingItem = placeholder.children[0];
+                        document.getElementById('drag-area').appendChild(existingItem);
+                    }
+                    placeholder.innerHTML = ''; // Ensure it's clean before appending
+                    placeholder.appendChild(clonedItem); // Añadir el clon
+                }
+            });
+        });
+
+        // Verificar respuestas de arrastrar y soltar
+        checkDragDropBtn.addEventListener('click', () => {
+            let allCorrect = true;
+            const correctMappings = {
+                'drag-voltaje': 'voltaje',
+                'drag-corriente': 'corriente',
+                'drag-resistencia': 'resistencia'
+            };
+            
+            dropTargets.forEach(target => {
+                target.classList.remove('correct', 'incorrect'); // Limpiar estilos anteriores
+                const placedItem = target.querySelector('.drag-item');
+                const expectedConcept = target.getAttribute('data-concept');
+
+                if (placedItem && correctMappings[placedItem.id] === expectedConcept) {
+                    target.classList.add('correct');
+                } else {
+                    allCorrect = false;
+                    target.classList.add('incorrect');
+                }
+            });
+
+            if (allCorrect) {
+                dragDropFeedback.textContent = '¡Excelente! Has asociado correctamente todos los conceptos.';
+                dragDropFeedback.className = 'feedback correct';
+                if (!checkDragDropBtn.dataset.earnedPoints) {
+                    addPoints(20, 'drag_drop');
+                    earnBadge('badge2', 'drag_drop');
+                    checkDragDropBtn.dataset.earnedPoints = 'true'; 
+                }
+            } else {
+                dragDropFeedback.textContent = 'Hay algunos errores. Revisa tus asociaciones e intenta de nuevo.';
+                dragDropFeedback.className = 'feedback incorrect';
+            }
+        });
+
+
+        // Calculadora de Ley de Ohm (general)
+        const calcBtn = document.getElementById('calculate-ohm');
+        calcBtn.addEventListener('click', () => {
+            const voltageInput = document.getElementById('voltage');
+            const currentInput = document.getElementById('current');
+            const resistanceInput = document.getElementById('resistance');
+            const resultDiv = document.querySelector('.calculator .result');
+            
+            let V = parseFloat(voltageInput.value);
+            let I = parseFloat(currentInput.value);
+            let R = parseFloat(resistanceInput.value);
+
+            let calculated = false;
+
+            // Clear previous calculations
+            resultDiv.textContent = ''; 
+
+            if (!isNaN(V) && !isNaN(I) && isNaN(R)) {
+                R = V / I;
+                resistanceInput.value = R.toFixed(2);
+                resultDiv.textContent = `R = V / I = ${V}V / ${I}A = ${R.toFixed(2)}Ω`;
+                calculated = true;
+            } else if (!isNaN(V) && isNaN(I) && !isNaN(R)) {
+                I = V / R;
+                currentInput.value = I.toFixed(2);
+                resultDiv.textContent = `I = V / R = ${V}V / ${R}Ω = ${I.toFixed(2)}A`;
+                calculated = true;
+            } else if (isNaN(V) && !isNaN(I) && !isNaN(R)) {
+                V = I * R;
+                voltageInput.value = V.toFixed(2);
+                resultDiv.textContent = `V = I × R = ${I}A × ${R}Ω = ${V.toFixed(2)}V`;
+                calculated = true;
+            } else {
+                resultDiv.textContent = 'Introduce exactamente dos valores para calcular el tercero.';
+            }
+
+            if (calculated) {
+                 // No sumamos puntos aquí porque es una calculadora general, no un ejercicio evaluable.
+                 // sendScoreToSheet('calculator_used', 0, points, 'general_calculator'); 
+            }
+        });
+
+        // Ejercicio de la sección "La fórmula mágica" (Calcula lo que falta)
+        document.getElementById('check-formula-exercise').addEventListener('click', () => { 
+            const current = parseFloat(document.getElementById('ex-current').value);
+            const resistance = parseFloat(document.getElementById('ex-resistance').value);
+            const userAnswer = parseFloat(document.getElementById('ex-voltage').value); 
+            const feedbackDiv = document.getElementById('formula-exercise-feedback');
+
+            if (!isNaN(current) && !isNaN(resistance) && !isNaN(userAnswer)) {
+                const correctAnswer = current * resistance;
+                
+                if (Math.abs(userAnswer - correctAnswer) < 0.01) { 
+                    if (!document.getElementById('check-formula-exercise').dataset.earnedPoints) {
+                        feedbackDiv.textContent = `¡Correcto! V = I × R = ${current}A × ${resistance}Ω = ${correctAnswer.toFixed(2)}V.`;
+                        feedbackDiv.className = 'feedback correct';
+                        addPoints(15, 'formula_magic_calc'); 
+                        document.getElementById('check-formula-exercise').dataset.earnedPoints = 'true'; 
+                    } else {
+                        feedbackDiv.textContent = `¡Ya lo habías calculado correctamente! El voltaje es ${correctAnswer.toFixed(2)}V.`;
+                        feedbackDiv.className = 'feedback correct';
+                    }
+                } else {
+                    feedbackDiv.textContent = `Incorrecto. El voltaje esperado es ${correctAnswer.toFixed(2)}V. Revisa tu cálculo.`;
+                    feedbackDiv.className = 'feedback incorrect';
+                }
+            } else {
+                feedbackDiv.textContent = 'Por favor, ingresa un valor para el voltaje.';
+                feedbackDiv.className = 'feedback incorrect';
+            }
+        });
+
+        // Ejemplos reales
+        document.getElementById('check-ex1').addEventListener('click', () => {
+            const voltage = 12;
+            const resistance = 2.4;
+            const userAnswer = parseFloat(document.getElementById('ex1-current').value);
+            const feedbackDiv = document.getElementById('feedback-ex1');
+
+            const correctAnswer = voltage / resistance;
+
+            if (!isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 0.01) {
+                if (!document.getElementById('check-ex1').dataset.earnedPoints) {
+                    feedbackDiv.textContent = `¡Correcto! I = V / R = 12V / 2.4Ω = ${correctAnswer.toFixed(2)}A.`;
+                    feedbackDiv.className = 'feedback correct';
+                    addPoints(10, 'example1');
+                    document.getElementById('check-ex1').dataset.earnedPoints = 'true';
+                } else {
+                    feedbackDiv.textContent = `¡Ya lo habías calculado correctamente! La corriente es ${correctAnswer.toFixed(2)}A.`;
+                    feedbackDiv.className = 'feedback correct';
+                }
+            } else {
+                feedbackDiv.textContent = `Incorrecto. La corriente correcta es ${correctAnswer.toFixed(2)}A. Recuerda I = V/R.`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+        });
+
+        document.getElementById('check-ex2').addEventListener('click', () => {
+            const voltage = 5;
+            const current = 0.5;
+            const userAnswer = parseFloat(document.getElementById('ex2-resistance').value);
+            const feedbackDiv = document.getElementById('feedback-ex2');
+
+            const correctAnswer = voltage / current;
+
+            if (!isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 0.01) {
+                 if (!document.getElementById('check-ex2').dataset.earnedPoints) {
+                    feedbackDiv.textContent = `¡Correcto! R = V / I = 5V / 0.5A = ${correctAnswer.toFixed(2)}Ω.`;
+                    feedbackDiv.className = 'feedback correct';
+                    addPoints(10, 'example2');
+                    document.getElementById('check-ex2').dataset.earnedPoints = 'true';
+                } else {
+                    feedbackDiv.textContent = `¡Ya lo habías calculado correctamente! La resistencia es ${correctAnswer.toFixed(2)}Ω.`;
+                    feedbackDiv.className = 'feedback correct';
+                }
+            } else {
+                feedbackDiv.textContent = `Incorrecto. La resistencia correcta es ${correctAnswer.toFixed(2)}Ω. Recuerda R = V/I.`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+        });
+
+        // Practica tú mismo
+        document.getElementById('check-practice1').addEventListener('click', () => {
+            const voltage = 12;
+            const current = 6;
+            const userAnswer = parseFloat(document.getElementById('practice1-resistance').value);
+            const feedbackDiv = document.getElementById('feedback-practice1');
+
+            const correctAnswer = voltage / current; // R = V/I
+
+            if (!isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 0.01) {
+                if (!document.getElementById('check-practice1').dataset.earnedPoints) {
+                    feedbackDiv.textContent = `¡Correcto! R = V / I = 12V / 6A = ${correctAnswer.toFixed(2)}Ω.`;
+                    feedbackDiv.className = 'feedback correct';
+                    addPoints(20, 'practice1');
+                    document.getElementById('check-practice1').dataset.earnedPoints = 'true';
+                } else {
+                    feedbackDiv.textContent = `¡Ya lo habías calculado correctamente! La resistencia es ${correctAnswer.toFixed(2)}Ω.`;
+                    feedbackDiv.className = 'feedback correct';
+                }
+            } else {
+                feedbackDiv.textContent = `Incorrecto. La resistencia correcta es ${correctAnswer.toFixed(2)}Ω.`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+        });
+
+        document.getElementById('check-practice2').addEventListener('click', () => {
+            const resistance = 16;
+            const current = 0.75;
+            const userAnswer = parseFloat(document.getElementById('practice2-voltage').value);
+            const feedbackDiv = document.getElementById('feedback-practice2');
+
+            const correctAnswer = current * resistance; // V = I * R
+
+            if (!isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) < 0.01) {
+                if (!document.getElementById('check-practice2').dataset.earnedPoints) {
+                    feedbackDiv.textContent = `¡Correcto! V = I × R = 0.75A × 16Ω = ${correctAnswer.toFixed(2)}V.`;
+                    feedbackDiv.className = 'feedback correct';
+                    addPoints(20, 'practice2');
+                    earnBadge('badge4', 'practice2'); // Insignia final
+                    document.getElementById('check-practice2').dataset.earnedPoints = 'true';
+                } else {
+                    feedbackDiv.textContent = `¡Ya lo habías calculado correctamente! El voltaje es ${correctAnswer.toFixed(2)}V.`;
+                    feedbackDiv.className = 'feedback correct';
+                }
+            } else {
+                feedbackDiv.textContent = `Incorrecto. El voltaje correcto es ${correctAnswer.toFixed(2)}V.`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+        });
+
+        // Inicializar la primera lección y módulo abierto
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstLesson = document.querySelector('.lesson[data-section="intro"]');
+            if (firstLesson) {
+                firstLesson.classList.add('active');
+                firstLesson.closest('.module-content').style.display = 'block';
+                document.getElementById('intro-section').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
